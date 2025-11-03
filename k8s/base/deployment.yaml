@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-docker-app
+  labels:
+    app: node-docker-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-docker-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: node-docker-app
+    spec:
+      serviceAccountName: node-app-sa
+      containers:
+        - name: node-docker-app
+          image: node-docker-app:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: node-app-config
+            - secretRef:
+                name: node-app-secret
+          volumeMounts:
+            - name: app-storage
+              mountPath: /usr/src/app/data
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+      volumes:
+        - name: app-storage
+          persistentVolumeClaim:
+            claimName: node-app-pvc

@@ -1,0 +1,13 @@
+namespace: node-app
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - persistent-volume.yaml
+  - persistent-volume-claim.yaml
+  - deployment.yaml
+  - service.yaml
+  - rbac.yaml
+  - hpa.yaml
+  - resourcequota.yaml
